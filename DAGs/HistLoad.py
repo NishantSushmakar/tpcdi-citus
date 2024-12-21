@@ -13,6 +13,9 @@ with open('/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/LoadBroker
 with open('/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/LoadCompany.sql', 'r') as file:
     load_dimCompany_sql = file.read()
 
+with open('/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/LoadFinancial.sql', 'r') as file:
+    load_Financial_sql = file.read()
+
 
 # Helper function to safely trim and extract substrings
 def extract_field(row, start, length):
@@ -188,8 +191,12 @@ with DAG(
         sql=load_dimCompany_sql
     )
 
-
+    load_Financial = PostgresOperator(
+        task_id="load_Financial",
+        postgres_conn_id="citus_master_conn",
+        sql=load_Financial_sql
+    )
     
-    load_BatchDate >> load_dimDate >> load_taxRate >> load_statusType >> load_Industry >> load_tradetype >> load_dimTime >> load_dimBroker >> Parse_Finwire >> load_dimCompany
+    load_BatchDate >> load_dimDate >> load_taxRate >> load_statusType >> load_Industry >> load_tradetype >> load_dimTime >> load_dimBroker >> Parse_Finwire >> load_dimCompany >> load_Financial
 
 
