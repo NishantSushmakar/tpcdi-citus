@@ -43,3 +43,15 @@ insert into dimcompany
 		finwire_cmp fin_cmp left join statustype st on fin_cmp.status = st.st_id
         left join industry ind on fin_cmp.industryid = ind.in_id; 
 
+-- Alerts for dimcompany
+truncate table dimessages;
+insert into dimessages
+	select 
+	now(),
+	1 as batchid,
+	'DimCompany' as messagesource,
+	'Invalid SPRating' as messagetext,
+	'Alert' as messagetype,
+	('CO_ID = ' || cik::varchar || ', CO_SP_RATE = ' || sprating::varchar) as messagedata
+	from finwire_cmp
+	where sprating not in ('AAA','AA','AA+','AA-','A','A+','A-','BBB','BBB+','BBB-','BB','BB+','BB-','B','B+','B-','CCC','CCC+','CCC-','CC','C','D');
