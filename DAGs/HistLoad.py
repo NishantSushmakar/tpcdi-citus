@@ -132,43 +132,43 @@ with DAG(
     load_BatchDate = PostgresOperator(
         task_id="load_BatchDate",
         postgres_conn_id="citus_master_conn",
-        sql="COPY batchdate FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/BatchDate.txt';"
+        sql="truncate table batchdate; COPY batchdate FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/BatchDate.txt';"
     )
 
     load_dimDate = PostgresOperator(
         task_id="load_dimDate",
         postgres_conn_id="citus_master_conn",
-        sql="COPY dimdate FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/Date.txt' delimiter '|';"
+        sql="truncate table dimdate; COPY dimdate FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/Date.txt' delimiter '|';"
     )
     
     load_taxRate = PostgresOperator(
         task_id="load_taxRate",
         postgres_conn_id="citus_master_conn",
-        sql="COPY taxrate FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/TaxRate.txt' delimiter '|';"
+        sql="truncate table taxrate; COPY taxrate FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/TaxRate.txt' delimiter '|';"
     )
 
     load_statusType = PostgresOperator(
         task_id="load_statusType",
         postgres_conn_id="citus_master_conn",
-        sql="COPY statustype FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/StatusType.txt' delimiter '|';"
+        sql="truncate table statustype; COPY statustype FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/StatusType.txt' delimiter '|';"
     )
 
     load_Industry = PostgresOperator(
         task_id="load_Industry",
         postgres_conn_id="citus_master_conn",
-        sql="COPY industry FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/Industry.txt' delimiter '|';"
+        sql="truncate table industry; COPY industry FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/Industry.txt' delimiter '|';"
     )
 
     load_tradetype = PostgresOperator(
         task_id="load_tradetype",
         postgres_conn_id="citus_master_conn",
-        sql="COPY tradetype FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/TradeType.txt' delimiter '|';"
+        sql="truncate table tradetype; COPY tradetype FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/TradeType.txt' delimiter '|';"
     )
 
     load_dimTime = PostgresOperator(
         task_id="load_dimTime",
         postgres_conn_id="citus_master_conn",
-        sql="COPY dimtime FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/Time.txt' delimiter '|';"
+        sql="truncate table dimtime; COPY dimtime FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/Time.txt' delimiter '|';"
     )
 
     load_dimBroker = PostgresOperator(

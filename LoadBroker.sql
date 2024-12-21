@@ -1,3 +1,4 @@
+truncate table hr;
 COPY hr FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/HR.csv' delimiter ',' CSV;
 
 truncate table dimbroker;
