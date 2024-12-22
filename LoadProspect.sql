@@ -1,4 +1,4 @@
-COPY prospect_temp FROM '/Users/nishantsushmakar/Documents/projects_ulb/tpcdi-citus/data/scale_1/Batch1/Prospect.csv' delimiter ',' CSV;
+COPY prospect_temp FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/Prospect.csv' delimiter ',' CSV;
 
 truncate table prospect;
 insert into prospect
