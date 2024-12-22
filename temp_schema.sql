@@ -72,3 +72,83 @@ create table finwire_fin(
 	dilutedshout char(13) check(length(dilutedshout) > 0),
 	conameorcik char(60) check(length(conameorcik) > 0)
 );
+
+
+drop table if exists prospect_temp;
+create table prospect_temp(
+	agencyid char(30) not null,
+	lastname char(30) not null,
+	firstname char(30) not null,
+	middleinitial char(1),
+	gender char(1),
+	addressline1 char(80),
+	addressline2 char(80),
+	postalcode char(12),
+	city char(25) not null,
+	state char(20) not null,
+	country char(24),
+	phone char(30),
+	income numeric(9) check(income >= 0),
+	numbercars numeric(2) check(numbercars >= 0),
+	numberchildren numeric(2) check(numberchildren >= 0),
+	maritalstatus char(1),
+	age numeric(3) check(age >= 0),
+	creditrating numeric(4) check(creditrating >= 0),
+	ownorrentflag char(1),
+	employer char(30),
+	numbercreditcards numeric(2) check(numbercreditcards >= 0),
+	networth numeric(12) check(networth >= 0)	
+);
+
+
+drop table if exists customermgmt;
+create table customermgmt(
+	--action element
+	actiontype char(9) check(actiontype in ('NEW','ADDACCT','UPDCUST','UPDACCT','CLOSEACCT','INACT')),
+	actionts varchar check(length(actionts) > 0),
+	--action.customer element
+	c_id numeric(11) not null check(c_id >= 0),
+	c_tax_id char(20) check((actiontype = 'NEW' and length(c_tax_id) > 0) or (actiontype != 'NEW')),
+	c_gndr char(1) check(length(c_gndr) > 0),
+	c_tier numeric(1) check(c_tier >= 0),
+	c_dob date check((actiontype = 'NEW' and c_dob is not null) or (actiontype != 'NEW')),
+	--action.customer.name element
+	c_l_name char(25) check((actiontype = 'NEW' and length(c_l_name) > 0) or (actiontype != 'NEW')),
+	c_f_name char(20) check((actiontype = 'NEW' and length(c_f_name) > 0) or (actiontype != 'NEW')),
+	c_m_name char(1),
+	--action.customer.address element
+	c_adline1 char(80) check((actiontype = 'NEW' and length(c_adline1) > 0) or (actiontype != 'NEW')),
+	c_adline2 char(80),
+	c_zipcode char(12) check((actiontype = 'NEW' and length(c_zipcode) > 0) or (actiontype != 'NEW')),
+	c_city char(25) check((actiontype = 'NEW' and length(c_city) > 0) or (actiontype != 'NEW')),
+	c_state_prov char(20) check((actiontype = 'NEW' and length(c_state_prov) > 0) or (actiontype != 'NEW')),
+	c_ctry char(24),
+	--action.customer.contactinfo element
+	c_prim_email char(50),
+	c_alt_email char(50),
+	--action.customer.contactinfo.phone element
+	--phone1
+	c_p_1_ctry_code char(20),
+	c_p_1_area_code char(20),
+	c_p_1_local char(20),
+	c_p_1_ext char(20),
+	--phone2
+	c_p_2_ctry_code char(20),
+	c_p_2_area_code char(20),
+	c_p_2_local char(20),
+	c_p_2_ext char(20),
+	--phone3
+	c_p_3_ctry_code char(20),
+	c_p_3_area_code char(20),
+	c_p_3_local char(20),
+	c_p_3_ext char(20),
+	--action.customer.taxinfo element
+	c_lcl_tx_id char(4),
+	c_nat_tx_id char(4),
+	--action.customer.account attribute
+	ca_id numeric(11),
+	ca_tax_st numeric(1) check((actiontype = 'NEW' and ca_tax_st >= 0) or (actiontype != 'NEW')),
+	--action.customer.account element
+	ca_b_id numeric(11) check((actiontype = 'NEW' and ca_b_id >= 0) or (actiontype != 'NEW')),
+	ca_name char(50)	
+);
