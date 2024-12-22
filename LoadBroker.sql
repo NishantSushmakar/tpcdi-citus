@@ -1,5 +1,19 @@
 truncate table hr;
-COPY hr FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/HR.csv' delimiter ',' CSV;
+
+DO $$ 
+DECLARE
+    base_path TEXT;
+BEGIN
+    -- Retrieve the base path from the config table
+    SELECT value_text INTO base_path
+    FROM config
+    WHERE key_name = 'base_path';
+
+    -- Use dynamic SQL to execute the COPY command with the file path
+    EXECUTE format('COPY hr FROM %L DELIMITER '','' CSV;', base_path || '/data/Batch1/HR.csv');
+
+END $$;
+
 
 truncate table dimbroker;
 insert into dimbroker

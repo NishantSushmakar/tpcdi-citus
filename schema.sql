@@ -319,3 +319,9 @@ create table audit(
 	value numeric(15),
 	dvalue numeric(15, 5)
 );
+
+drop table if exists config;
+CREATE TABLE config (
+    key_name VARCHAR PRIMARY KEY,
+    value_text TEXT
+);

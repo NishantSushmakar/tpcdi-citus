@@ -9,28 +9,36 @@ import xmltodict
 import json
 import numpy as np
 
-with open('/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/LoadBroker.sql', 'r') as file:
+PATH = "/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus"
+
+with open(os.path.join(PATH, 'schema.sql'), 'r') as file:
+    createSchema = file.read()
+
+with open(os.path.join(PATH, 'temp_schema.sql'), 'r') as file:
+    createTempSchema = file.read()
+
+with open(os.path.join(PATH, 'LoadBroker.sql'), 'r') as file:
     load_dimBroker_sql = file.read()
 
-with open('/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/LoadCompany.sql', 'r') as file:
+with open(os.path.join(PATH, 'LoadCompany.sql'), 'r') as file:
     load_dimCompany_sql = file.read()
 
-with open('/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/LoadFinancial.sql', 'r') as file:
+with open(os.path.join(PATH, 'LoadFinancial.sql'), 'r') as file:
     load_Financial_sql = file.read()
 
-with open('/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/LoadProspect.sql', 'r') as file:
+with open(os.path.join(PATH, 'LoadProspect.sql'), 'r') as file:
     load_prospect_sql = file.read()
 
-with open('/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/LoadCustomer.sql', 'r') as file:
+with open(os.path.join(PATH, 'LoadCustomer.sql'), 'r') as file:
     load_customer_sql = file.read()
 
-with open('/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/Load_dimessages_dimcustomer.sql', 'r') as file:
+with open(os.path.join(PATH, 'Load_dimessages_dimcustomer.sql'), 'r') as file:
     load_dimessages_customer_sql = file.read()
 
-with open('/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/UpdateProspect.sql', 'r') as file:
+with open(os.path.join(PATH, 'UpdateProspect.sql'), 'r') as file:
     update_prospect_sql = file.read()
 
-with open('/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/LoadAccount.sql', 'r') as file:
+with open(os.path.join(PATH, 'LoadAccount.sql'), 'r') as file:
     load_account_sql = file.read()
 
 
@@ -49,7 +57,7 @@ def extract_year_quarter(file_name):
 
 def ProcessFinwire():
 # Directory containing the Finwire files
-    input_dir = "/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1"  # Replace with your directory path
+    input_dir = f"{PATH}/data/Batch1"  # Replace with your directory path
 
 
     # Get the list of files and sort them by year and quarter
@@ -135,24 +143,24 @@ def ProcessFinwire():
     df_fin = pd.DataFrame(finwire_fin)
 
     # Save to CSV
-    df_cmp.to_csv("/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/finwire_cmp.csv", index=False, header=False)
-    df_sec.to_csv("/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/finwire_sec.csv", index=False, header=False)
-    df_fin.to_csv("/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/finwire_fin.csv", index=False, header=False)
+    df_cmp.to_csv(f"{PATH}/finwire_cmp.csv", index=False, header=False)
+    df_sec.to_csv(f"{PATH}/finwire_sec.csv", index=False, header=False)
+    df_fin.to_csv(f"{PATH}]finwire_fin.csv", index=False, header=False)
 
     print("All files processed and CSV outputs created!")
 
 
 def customermgmt_convert():
 
-    with open('/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/Batch1/CustomerMgmt.xml') as fd:
+    with open(os.path.join(PATH, 'data/Batch1/CustomerMgmt.xml')) as fd:
         doc = xmltodict.parse(fd.read()) 
         fd.close()
 
-    with open("//Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/Batch1/CustomerData.json", "w") as outfile:
+    with open(os.path.join(PATH, 'data/Batch1/CustomerData.json'), "w") as outfile:
         outfile.write(json.dumps(doc))
         outfile.close()
 
-    f = open('//Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/Batch1/CustomerData.json','r')
+    f = open(os.path.join(PATH, 'data/Batch1/CustomerData.json'),'r')
 
     cust = json.load(f)
     actions = cust['TPCDI:Actions']
@@ -268,7 +276,7 @@ def customermgmt_convert():
 
     cust_df.replace(to_replace = np.nan, value = "", inplace = True)
     cust_df.replace(to_replace = "None", value = "", inplace = True)
-    cust_df.to_csv('/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/CustomerMgmt.csv', index = False)
+    cust_df.to_csv(f"{PATH}/CustomerMgmt.csv", index = False)
     print('Customer Management data converted from XML to CSV')
     f.close()
 
@@ -279,47 +287,65 @@ with DAG(
     schedule_interval="@once",
     catchup=False,
 ) as dag:
-    
+
+    set_path = PostgresOperator(
+        task_id="set_path",
+        postgres_conn_id="citus_master_conn",
+        sql=f"truncate table config; INSERT INTO config (key_name, value_text) VALUES ('base_path', '{PATH}');"
+    )
+
+    create_schema = PostgresOperator(
+        task_id="create_schema",
+        postgres_conn_id="citus_master_conn",
+        sql=createSchema
+    )
+
+    create_temp_schema = PostgresOperator(
+        task_id="create_temp_schema",
+        postgres_conn_id="citus_master_conn",
+        sql=createTempSchema
+    )
+
     load_BatchDate = PostgresOperator(
         task_id="load_BatchDate",
         postgres_conn_id="citus_master_conn",
-        sql="truncate table batchdate; COPY batchdate FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/BatchDate.txt';"
+        sql=f"truncate table batchdate; COPY batchdate FROM '{PATH}/data/Batch1/BatchDate.txt';"
     )
 
     load_dimDate = PostgresOperator(
         task_id="load_dimDate",
         postgres_conn_id="citus_master_conn",
-        sql="truncate table dimdate; COPY dimdate FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/Date.txt' delimiter '|';"
+        sql=f"truncate table dimdate; COPY dimdate FROM '{PATH}/data/Batch1/Date.txt' delimiter '|';"
     )
     
     load_taxRate = PostgresOperator(
         task_id="load_taxRate",
         postgres_conn_id="citus_master_conn",
-        sql="truncate table taxrate; COPY taxrate FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/TaxRate.txt' delimiter '|';"
+        sql=f"truncate table taxrate; COPY taxrate FROM '{PATH}/data/Batch1/TaxRate.txt' delimiter '|';"
     )
 
     load_statusType = PostgresOperator(
         task_id="load_statusType",
         postgres_conn_id="citus_master_conn",
-        sql="truncate table statustype; COPY statustype FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/StatusType.txt' delimiter '|';"
+        sql=f"truncate table statustype; COPY statustype FROM '{PATH}/data/Batch1/StatusType.txt' delimiter '|';"
     )
 
     load_Industry = PostgresOperator(
         task_id="load_Industry",
         postgres_conn_id="citus_master_conn",
-        sql="truncate table industry; COPY industry FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/Industry.txt' delimiter '|';"
+        sql=f"truncate table industry; COPY industry FROM '{PATH}/data/Batch1/Industry.txt' delimiter '|';"
     )
 
     load_tradetype = PostgresOperator(
         task_id="load_tradetype",
         postgres_conn_id="citus_master_conn",
-        sql="truncate table tradetype; COPY tradetype FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/TradeType.txt' delimiter '|';"
+        sql=f"truncate table tradetype; COPY tradetype FROM '{PATH}/data/Batch1/TradeType.txt' delimiter '|';"
     )
 
     load_dimTime = PostgresOperator(
         task_id="load_dimTime",
         postgres_conn_id="citus_master_conn",
-        sql="truncate table dimtime; COPY dimtime FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/Time.txt' delimiter '|';"
+        sql=f"truncate table dimtime; COPY dimtime FROM '{PATH}/data/Batch1/Time.txt' delimiter '|';"
     )
 
     load_dimBroker = PostgresOperator(
@@ -360,7 +386,7 @@ with DAG(
     load_customermgmt = PostgresOperator(
         task_id = 'load_customermgmt',
         postgres_conn_id="citus_master_conn",
-        sql ="COPY customermgmt FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/CustomerMgmt.csv' DELIMITER ',' CSV HEADER;"
+        sql =f"COPY customermgmt FROM '{PATH}/CustomerMgmt.csv' DELIMITER ',' CSV HEADER;"
     )
 
     load_dimcustomer = PostgresOperator(
@@ -390,7 +416,9 @@ with DAG(
 
     )
     
-    load_BatchDate >> load_dimDate >> load_taxRate >> load_statusType >> load_Industry >> load_tradetype >> load_dimTime >> load_dimBroker >> Parse_Finwire >> load_dimCompany >> load_Financial
+    create_schema >> create_temp_schema >> set_path
+
+    set_path >> load_BatchDate >> load_dimDate >> load_taxRate >> load_statusType >> load_Industry >> load_tradetype >> load_dimTime >> load_dimBroker >> Parse_Finwire >> load_dimCompany >> load_Financial
 
     load_Financial >> load_prospect >> cnvrt_customermgmt >> load_customermgmt >> load_dimcustomer >> load_dimessages_dimcustomer >> update_prospect
 

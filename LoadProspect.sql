@@ -1,4 +1,18 @@
-COPY prospect_temp FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/data/Batch1/Prospect.csv' delimiter ',' CSV;
+truncate table prospect_temp;
+
+DO $$ 
+DECLARE
+    base_path TEXT;
+BEGIN
+    -- Retrieve the base path from the config table
+    SELECT value_text INTO base_path
+    FROM config
+    WHERE key_name = 'base_path';
+
+    -- Use dynamic SQL to execute the COPY command with the file path
+    EXECUTE format('COPY prospect_temp FROM %L DELIMITER '','' CSV;', base_path || '/data/Batch1/Prospect.csv');
+
+END $$;
 
 truncate table prospect;
 insert into prospect

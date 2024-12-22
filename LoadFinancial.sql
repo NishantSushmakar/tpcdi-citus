@@ -1,5 +1,19 @@
 truncate table finwire_fin;
-COPY finwire_fin FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/finwire_fin.csv' delimiter ',' CSV;
+
+DO $$ 
+DECLARE
+    base_path TEXT;
+BEGIN
+    -- Retrieve the base path from the config table
+    SELECT value_text INTO base_path
+    FROM config
+    WHERE key_name = 'base_path';
+
+    -- Use dynamic SQL to execute the COPY command with the file path
+    EXECUTE format('COPY finwire_fin FROM %L DELIMITER '','' CSV;', base_path || '/finwire_fin.csv');
+
+END $$;
+
 
 truncate table financial;
 insert into financial 

@@ -1,5 +1,20 @@
 truncate table finwire_cmp;
-COPY finwire_cmp FROM '/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus/finwire_cmp.csv' delimiter ',' CSV;
+
+DO $$ 
+DECLARE
+    base_path TEXT;
+BEGIN
+    -- Retrieve the base path from the config table
+    SELECT value_text INTO base_path
+    FROM config
+    WHERE key_name = 'base_path';
+
+    -- Use dynamic SQL to execute the COPY command with the file path
+    EXECUTE format('COPY finwire_cmp FROM %L DELIMITER '','' CSV;', base_path || '/finwire_cmp.csv');
+
+END $$;
+
+
 
 -- dimcompany
 truncate table dimcompany;
