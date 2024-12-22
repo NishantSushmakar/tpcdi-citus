@@ -152,3 +152,11 @@ create table customermgmt(
 	ca_b_id numeric(11) check((actiontype = 'NEW' and ca_b_id >= 0) or (actiontype != 'NEW')),
 	ca_name char(50)	
 );
+
+drop table if exists cashtransaction;
+create table cashtransaction(
+	ct_ca_id numeric(11) not null check(ct_ca_id >= 0),
+	ct_dts timestamp not null,
+	ct_amt numeric(10, 2) not null,
+	ct_name char(100) not null
+);
