@@ -44,6 +44,9 @@ with open(os.path.join(PATH, 'LoadAccount.sql'), 'r') as file:
 with open(os.path.join(PATH, 'LoadCashBalances.sql'), 'r') as file:
     LoadCashBalances_sql = file.read()
 
+with open(os.path.join(PATH, 'LoadSecurity.sql'), 'r') as file:
+    load_security_sql = file.read()
+
 # Helper function to safely trim and extract substrings
 def extract_field(row, start, length):
     return row[start - 1: start - 1 + length].strip() if row else None
@@ -425,6 +428,12 @@ with DAG(
 
     )
     
+    load_dimSecurity = PostgresOperator(
+            task_id = 'load_dimSecurity',
+            postgres_conn_id = 'citus_master_conn',
+            sql = load_security_sql
+    )
+
     create_schema >> create_temp_schema >> set_path
 
     set_path >> load_BatchDate >> load_dimDate >> load_taxRate >> load_statusType >> load_Industry >> load_tradetype >> load_dimTime >> load_dimBroker >> Parse_Finwire >> load_dimCompany >> load_Financial
@@ -432,3 +441,5 @@ with DAG(
     load_Financial >> load_prospect >> cnvrt_customermgmt >> load_customermgmt >> load_dimcustomer >> load_dimessages_dimcustomer >> update_prospect
 
     update_prospect >> load_dimaccount >> load_CashBalances
+    
+    load_dimCompany >> load_dimSecurity
