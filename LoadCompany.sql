@@ -59,7 +59,6 @@ insert into dimcompany
         left join industry ind on fin_cmp.industryid = ind.in_id; 
 
 -- Alerts for dimcompany
-truncate table dimessages;
 insert into dimessages
 	select 
 	now(),

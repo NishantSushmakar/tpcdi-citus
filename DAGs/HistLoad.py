@@ -68,6 +68,8 @@ with open(os.path.join(PATH, 'Load_dimessages_factmarkethistory.sql'), 'r') as f
 with open(os.path.join(PATH, 'LoadFactWatches.sql'), 'r') as file:
     load_factwatches_sql = file.read()
 
+with open(os.path.join(PATH, 'tpcdi_validation.sql'), 'r') as file:
+    validation_query = file.read()
 
 # Helper function to safely trim and extract substrings
 def extract_field(row, start, length):
@@ -523,14 +525,26 @@ with DAG(
         sql = load_holdings_sql
     )
 
-    create_schema >> create_temp_schema >> set_dist_ref_schema >> set_path
+    run_validation_query_Init = PostgresOperator(
+        task_id="run_validation_query_Init",
+        postgres_conn_id="citus_master_conn",
+        sql=validation_query
+    )
 
-    set_path >> load_BatchDate >> load_dimDate >> load_taxRate >> load_statusType >> load_Industry >> load_tradetype >> load_dimTime >> load_dimBroker >> Parse_Finwire >> load_dimCompany >> load_Financial
+    run_validation_query_HistLoad = PostgresOperator(
+        task_id="run_validation_query_HistLoad",
+        postgres_conn_id="citus_master_conn",
+        sql=validation_query
+    )
+
+    create_schema >> create_temp_schema >> set_dist_ref_schema >> set_path >> run_validation_query_Init
+
+    run_validation_query_Init >> load_BatchDate >> load_dimDate >> load_taxRate >> load_statusType >> load_Industry >> load_tradetype >> load_dimTime >> load_dimBroker >> Parse_Finwire >> load_dimCompany >> load_Financial
 
     load_Financial >> load_prospect >> cnvrt_customermgmt >> load_customermgmt >> load_dimcustomer >> load_dimessages_dimcustomer >> update_prospect
 
     update_prospect >> load_dimaccount >> load_CashBalances >> load_dimSecurity >> load_trade_history >> load_trade >> load_dailymarket >> load_fact_market_history >> load_dimessages_factmarkethistory >> load_watchhistory >> load_factwatches
     
-    load_factwatches >> load_dimtrade >> load_dimessages_dimtrade >> load_holdings
+    load_factwatches >> load_dimtrade >> load_dimessages_dimtrade >> load_holdings >> run_validation_query_HistLoad
 
     
