@@ -161,7 +161,6 @@ create table cashtransaction(
 	ct_name char(100) not null
 );
 
-
 drop table if exists trade;
 create table trade(
 	t_id numeric(15) not null check(t_id >= 0),
@@ -178,6 +177,14 @@ create table trade(
 	t_chrg numeric(10,2) check((t_st_id = 'CMPT' and t_chrg >= 0) or (t_st_id != 'CMPT' and t_chrg is null)),
 	t_comm numeric(10,2) check((t_st_id = 'CMPT' and t_comm >= 0) or (t_st_id != 'CMPT' and t_comm is null)),
 	t_tax numeric(10,2) check((t_st_id = 'CMPT' and t_tax >= 0) or (t_st_id != 'CMPT' and t_tax is null))
+);
+
+drop table if exists holdinghistory;
+create table holdinghistory(
+	hh_h_t_id numeric(15) not null check(hh_h_t_id >= 0),
+	hh_t_id numeric(15) not null check(hh_t_id >= 0),
+	hh_before_qty numeric(6) not null check(hh_before_qty >= 0),
+	hh_after_qty numeric(6) not null check(hh_after_qty >= 0)
 );
 
 

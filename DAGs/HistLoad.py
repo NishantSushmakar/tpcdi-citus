@@ -53,6 +53,9 @@ with open(os.path.join(PATH, 'LoadTrade.sql'), 'r') as file:
 with open(os.path.join(PATH, 'Load_dimessages_dimtrade.sql'), 'r') as file:
     load_dimessages_dimtrade_sql = file.read()
 
+with open(os.path.join(PATH, 'LoadHoldings.sql'), 'r') as file:
+    load_holdings_sql = file.read()
+
 with open(os.path.join(PATH, 'LoadFactMarketHistory.sql'), 'r') as file:
     load_fact_market_history_sql = file.read()
 
@@ -450,9 +453,6 @@ with DAG(
             sql = load_security_sql
     )
 
-
-
-
     load_trade_history = PostgresOperator(
             task_id = 'load_trade_history',
             postgres_conn_id = 'citus_master_conn',
@@ -508,6 +508,11 @@ with DAG(
         sql = load_factwatches_sql 
     )
 
+    load_holdings = PostgresOperator(
+        task_id ='load_holdings',
+        postgres_conn_id='citus_master_conn',
+        sql = load_holdings_sql
+    )
 
     create_schema >> create_temp_schema >> set_path
 
@@ -517,6 +522,6 @@ with DAG(
 
     update_prospect >> load_dimaccount >> load_CashBalances >> load_dimSecurity >> load_trade_history >> load_trade >> load_dailymarket >> load_fact_market_history >> load_dimessages_factmarkethistory >> load_watchhistory >> load_factwatches
     
-    load_factwatches >> load_dimtrade >> load_dimessages_dimtrade 
+    load_factwatches >> load_dimtrade >> load_dimessages_dimtrade >> load_holdings
 
     
