@@ -1,0 +1,22 @@
+SELECT create_reference_table('dimaccount');
+SELECT create_reference_table('dimbroker');
+SELECT create_reference_table('dimcompany');
+SELECT create_reference_table('dimcustomer');
+SELECT create_reference_table('dimdate');
+SELECT create_reference_table('dimsecurity');
+SELECT create_reference_table('dimtime');
+SELECT create_reference_table('dimessages');
+SELECT create_reference_table('industry');
+SELECT create_reference_table('financial');
+SELECT create_reference_table('statustype');
+SELECT create_reference_table('taxrate');
+SELECT create_reference_table('tradetype');
+SELECT create_reference_table('audit');
+SELECT create_reference_table('config');
+
+SELECT create_distributed_table('factcashbalances','sk_accountid');
+SELECT create_distributed_table('dimtrade','tradeid');
+SELECT create_distributed_table('factholdings','currenttradeid');
+SELECT create_distributed_table('factmarkethistory','sk_securityid');
+SELECT create_distributed_table('prospect','agencyid');
+SELECT create_distributed_table('factwatches','sk_customerid');

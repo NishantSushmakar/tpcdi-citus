@@ -14,6 +14,9 @@ PATH = "/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus"
 with open(os.path.join(PATH, 'schema.sql'), 'r') as file:
     createSchema = file.read()
 
+with open(os.path.join(PATH, 'Distribution.sql'), 'r') as file:
+    set_dist_ref_tables_sql = file.read()
+
 with open(os.path.join(PATH, 'temp_schema.sql'), 'r') as file:
     createTempSchema = file.read()
 
@@ -324,6 +327,12 @@ with DAG(
         sql=createSchema
     )
 
+    set_dist_ref_schema = PostgresOperator(
+        task_id ='set_dist_ref_schema',
+        postgres_conn_id='citus_master_conn',
+        sql = set_dist_ref_tables_sql
+    )
+
     create_temp_schema = PostgresOperator(
         task_id="create_temp_schema",
         postgres_conn_id="citus_master_conn",
@@ -514,7 +523,7 @@ with DAG(
         sql = load_holdings_sql
     )
 
-    create_schema >> create_temp_schema >> set_path
+    create_schema >> create_temp_schema >> set_dist_ref_schema >> set_path
 
     set_path >> load_BatchDate >> load_dimDate >> load_taxRate >> load_statusType >> load_Industry >> load_tradetype >> load_dimTime >> load_dimBroker >> Parse_Finwire >> load_dimCompany >> load_Financial
 
