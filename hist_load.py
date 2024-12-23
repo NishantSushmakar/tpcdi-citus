@@ -9,7 +9,7 @@ import xmltodict
 import json
 import numpy as np
 
-PATH = "/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcdi-citus"
+PATH = "/Users/nishantsushmakar/Documents/projects_ulb/tpcdi-citus"
 
 with open(os.path.join(PATH, 'schema.sql'), 'r') as file:
     createSchema = file.read()
@@ -61,7 +61,6 @@ with open(os.path.join(PATH, 'Load_dimessages_factmarkethistory.sql'), 'r') as f
 
 with open(os.path.join(PATH, 'LoadFactWatches.sql'), 'r') as file:
     load_factwatches_sql = file.read()
-
 
 # Helper function to safely trim and extract substrings
 def extract_field(row, start, length):
@@ -420,21 +419,18 @@ with DAG(
             task_id ='load_dimessages_dimcustomer',
             postgres_conn_id='citus_master_conn',
             sql = load_dimessages_customer_sql
-
     )
 
     update_prospect = PostgresOperator(
             task_id ='update_prospect',
             postgres_conn_id='citus_master_conn',
             sql = update_prospect_sql 
-
     )
 
     load_dimaccount = PostgresOperator(
             task_id ='load_dimaccount',
             postgres_conn_id='citus_master_conn',
             sql = load_account_sql
-
     )
 
     load_CashBalances = PostgresOperator(
@@ -449,9 +445,6 @@ with DAG(
             postgres_conn_id = 'citus_master_conn',
             sql = load_security_sql
     )
-
-
-
 
     load_trade_history = PostgresOperator(
             task_id = 'load_trade_history',
