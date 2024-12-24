@@ -1,4 +1,10 @@
 # tpcdi-citus
+This Project is implemented as a part of INFO-H-419: Data Warehouses course at ULB, supervised by  Prof. Esteban Zimányi. 
+
+Implemented by: Sara Saad, Marwah Sulaiman, Nishant Sushmakar, and Olha Baliasina.
+
+The project aims to perform the [TPC-DI benchmark](https://www.tpc.org/tpcdi/default5.asp) on Citus Database (a Postgres distributed extension) locally installed on MacOS machine.
+
 
 This project implements TPC-DI benchmark on Citus DB. 
 
