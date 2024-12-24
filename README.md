@@ -5,7 +5,7 @@ Implemented by: Sara Saad, Marwah Sulaiman, Nishant Sushmakar, and Olha Baliasin
 
 The project aims to perform the [TPC-DI benchmark](https://www.tpc.org/tpcdi/default5.asp) on Citus Database (a Postgres distributed extension) locally installed on MacOS machine.
 
-- Runtime on all selected scales are reported [here](tpcdi-citus/Results). The csv file includes the runtime for each ETL step for each of the 4 scales. 
+- Runtime on all selected scales are reported [here](Results). The csv file includes the runtime for each ETL step for each of the 4 scales. 
 
 
 In order to replicate our steps, the following should be done:
