@@ -23,7 +23,6 @@ In order to replicate our steps, the following should be done:
 
 3. Setup Airflow locally on the machine by following section 5.6 in the report.
 4. Install Citus locally on the machine by following section 5.7 Citus Cluster Setup in the report. 
-5. Add the DAG under the DAGs to you airflow dag directory
+5. Add the DAG under the DAGs folder to your airflow dag directory
 6. Change the path in the DAG to the project path in your PC
-
-5. Restart Airflow and run the DAG from the UI
+7. Restart Airflow and run the DAG from the UI
